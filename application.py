@@ -7,6 +7,8 @@ from openai import AzureOpenAI
 # Load environment variables
 load_dotenv()
 
+# Python 3.11 rebuild
+
 app = Flask(__name__)
 
 # Azure OpenAI Client - lazy initialization
