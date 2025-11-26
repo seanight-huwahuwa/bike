@@ -9,12 +9,18 @@ load_dotenv()
 
 app = Flask(__name__)
 
-# Azure OpenAI Client
-openai_client = AzureOpenAI(
-    api_key=os.getenv("AZURE_OPENAI_API_KEY"),
-    api_version="2024-08-01-preview",
-    azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT")
-)
+# Azure OpenAI Client - lazy initialization
+openai_client = None
+
+def get_openai_client():
+    global openai_client
+    if openai_client is None:
+        openai_client = AzureOpenAI(
+            api_key=os.getenv("AZURE_OPENAI_API_KEY"),
+            api_version="2024-08-01-preview",
+            azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT")
+        )
+    return openai_client
 
 # Database connection function
 def get_db_connection():
@@ -216,7 +222,8 @@ Here are the available bikes:
 Based on the customer's needs, recommend the most suitable bike(s) and explain why."""
         
         # Call Azure OpenAI
-        response = openai_client.chat.completions.create(
+        client = get_openai_client()
+        response = client.chat.completions.create(
             model=os.getenv("AZURE_OPENAI_DEPLOYMENT"),
             messages=[
                 {"role": "system", "content": system_message},
